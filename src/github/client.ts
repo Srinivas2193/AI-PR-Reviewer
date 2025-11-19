@@ -119,7 +119,7 @@ export class GitHubClient {
             owner,
             repo,
             issue_number: pullNumber,
-            body: `**File:** \`${comment.path}\` (Line ${comment.line})\n\n${comment.body}`
+            body: `**📁 File:** \`${comment.path}\` **(Line ${comment.line})**\n\n${comment.body}`
           });
         } catch (commentError) {
           logger.error('Failed to post individual comment', { commentError, path: comment.path });
