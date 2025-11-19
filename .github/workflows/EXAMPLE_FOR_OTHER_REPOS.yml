@@ -1,0 +1,20 @@
+# Copy this file to your other repositories!
+# Place it in: .github/workflows/ai-review.yml
+
+name: AI Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  ai-code-review:
+    # Use the reusable workflow from AI-PR-Reviewer repository
+    uses: Srinivas2193/AI-PR-Reviewer/.github/workflows/ai-review.yml@main
+    secrets:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+    with:
+      ai_provider: 'gemini'  # or 'openai' or 'anthropic'
+      gemini_model: 'gemini-1.5-pro'
+
