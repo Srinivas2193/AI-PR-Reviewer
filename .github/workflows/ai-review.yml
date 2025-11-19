@@ -33,9 +33,9 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
           # Choose your AI provider
           AI_PROVIDER: gemini
-                # Gemini (FREE - No billing required!)
-                GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-                GEMINI_MODEL: gemini-1.5-flash-latest
+          # Gemini (FREE - No billing required!)
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: gemini-1.5-flash-latest
           # OpenAI (requires billing)
           # OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           # OPENAI_MODEL: gpt-4o
