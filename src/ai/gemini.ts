@@ -35,10 +35,36 @@ export class GeminiProvider extends AIProvider {
 
       const data: any = await response.json();
       
-      // Find first model that supports generateContent
-      const availableModel = data.models?.find((m: any) => 
+      // Filter models that support generateContent
+      const compatibleModels = data.models?.filter((m: any) => 
         m.supportedGenerationMethods?.includes('generateContent')
-      );
+      ) || [];
+
+      // Prefer stable models over preview/experimental ones
+      // Priority: gemini-1.5-flash (fastest/cheapest) > gemini-1.5-pro > others
+      const preferredModelNames = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro'];
+      
+      let availableModel = null;
+      
+      // Try to find preferred models first
+      for (const preferred of preferredModelNames) {
+        availableModel = compatibleModels.find((m: any) => 
+          m.name.includes(preferred) && !m.name.includes('preview') && !m.name.includes('exp')
+        );
+        if (availableModel) break;
+      }
+      
+      // If no preferred model found, use any non-preview model
+      if (!availableModel) {
+        availableModel = compatibleModels.find((m: any) => 
+          !m.name.includes('preview') && !m.name.includes('exp')
+        );
+      }
+      
+      // Last resort: use any model
+      if (!availableModel) {
+        availableModel = compatibleModels[0];
+      }
 
       if (!availableModel) {
         throw new Error('No suitable Gemini model found that supports generateContent');
