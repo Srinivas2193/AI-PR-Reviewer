@@ -34,12 +34,32 @@ export class PRReviewer {
 
       // 4. Post inline comments (if any)
       if (reviewResult.comments.length > 0) {
+        // Add AI Code Reviewer branding to each comment
+        const brandedComments = reviewResult.comments.map(comment => {
+          // Extract category from comment body (e.g., [SECURITY], [PERFORMANCE])
+          const categoryMatch = comment.body.match(/^\[([A-Z_]+)\]/);
+          let formattedBody = comment.body;
+          let header = '🤖 **AI Code Reviewer**';
+          
+          if (categoryMatch) {
+            const category = categoryMatch[1];
+            header += ` *[${category}]*`;
+            // Remove the category from the body since we're showing it in the header
+            formattedBody = comment.body.replace(/^\[([A-Z_]+)\]\s*/, '');
+          }
+          
+          return {
+            ...comment,
+            body: `${header}\n\n${formattedBody}`
+          };
+        });
+        
         await this.githubClient.postReviewComments(
           owner,
           repo,
           pullNumber,
           commitSha,
-          reviewResult.comments
+          brandedComments
         );
       }
 

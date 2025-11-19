@@ -93,6 +93,9 @@ export class GitHubClient {
         pull_number: pullNumber,
         commit_id: commitId,
         event: 'COMMENT',
+        body: '## 🤖 AI Code Reviewer\n\n' +
+              `Found ${comments.length} issue${comments.length > 1 ? 's' : ''} that need attention. ` +
+              'See inline comments below for details.',
         comments: comments.map((c) => ({
           path: c.path,
           line: c.line,
@@ -101,9 +104,27 @@ export class GitHubClient {
         })),
       });
       logger.info('Review comments posted successfully');
-    } catch (error) {
-      logger.error('Failed to post review comments', { error });
-      throw error;
+    } catch (error: any) {
+      logger.error('Failed to post review comments', { 
+        error: error.message,
+        status: error.status,
+        response: error.response?.data 
+      });
+      
+      // If posting as review fails, try posting as individual comments
+      logger.info('Attempting to post as individual issue comments instead');
+      for (const comment of comments) {
+        try {
+          await this.octokit.issues.createComment({
+            owner,
+            repo,
+            issue_number: pullNumber,
+            body: `**📁 File:** \`${comment.path}\` **(Line ${comment.line})**\n\n${comment.body}`
+          });
+        } catch (commentError) {
+          logger.error('Failed to post individual comment', { commentError, path: comment.path });
+        }
+      }
     }
   }
 
