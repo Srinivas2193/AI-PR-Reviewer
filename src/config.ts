@@ -8,12 +8,16 @@ export interface Config {
     webhookSecret?: string;
   };
   ai: {
-    provider: 'openai' | 'anthropic';
+    provider: 'openai' | 'anthropic' | 'gemini';
     openai?: {
       apiKey: string;
       model: string;
     };
     anthropic?: {
+      apiKey: string;
+      model: string;
+    };
+    gemini?: {
       apiKey: string;
       model: string;
     };
@@ -35,7 +39,7 @@ function getConfig(): Config {
     throw new Error('GITHUB_TOKEN is required');
   }
 
-  const aiProvider = (process.env.AI_PROVIDER || 'openai') as 'openai' | 'anthropic';
+  const aiProvider = (process.env.AI_PROVIDER || 'openai') as 'openai' | 'anthropic' | 'gemini';
 
   const config: Config = {
     github: {
@@ -73,6 +77,15 @@ function getConfig(): Config {
     config.ai.anthropic = {
       apiKey: anthropicKey,
       model: process.env.ANTHROPIC_MODEL || 'claude-3-5-sonnet-20241022',
+    };
+  } else if (aiProvider === 'gemini') {
+    const geminiKey = process.env.GEMINI_API_KEY;
+    if (!geminiKey) {
+      throw new Error('GEMINI_API_KEY is required when AI_PROVIDER is gemini');
+    }
+    config.ai.gemini = {
+      apiKey: geminiKey,
+      model: process.env.GEMINI_MODEL || 'gemini-1.5-flash',
     };
   }
 
