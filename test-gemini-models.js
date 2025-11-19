@@ -1,10 +1,12 @@
 // Quick test script to list available Gemini models
-// Run with: node test-gemini-models.js YOUR_API_KEY
+// Run with: GEMINI_API_KEY=your_key node test-gemini-models.js
+// Or: node test-gemini-models.js YOUR_API_KEY (less secure)
 
-const apiKey = process.argv[2];
+const apiKey = process.env.GEMINI_API_KEY || process.argv[2];
 
 if (!apiKey) {
-  console.error('Usage: node test-gemini-models.js YOUR_API_KEY');
+  console.error('Usage: GEMINI_API_KEY=your_key node test-gemini-models.js');
+  console.error('   Or: node test-gemini-models.js YOUR_API_KEY');
   process.exit(1);
 }
 
