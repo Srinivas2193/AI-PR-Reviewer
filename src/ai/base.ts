@@ -41,6 +41,7 @@ Analyze this PR thoroughly and provide:
    - Explain the problem
    - Suggest a fix or improvement
    - Categorize: [SECURITY], [PERFORMANCE], [BUG], [STYLE], [BEST_PRACTICE]
+   - Start each comment with: "🤖 **AI Code Reviewer**\n\n"
 
 2. **Overall Assessment**: Provide a summary with:
    - Overall rating (1-10)
