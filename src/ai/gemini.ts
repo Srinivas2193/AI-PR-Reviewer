@@ -6,6 +6,7 @@ import logger from '../logger';
 export class GeminiProvider extends AIProvider {
   private apiKey: string;
   private model: string;
+  private resolvedModel: string | null = null;
 
   constructor() {
     super();
@@ -16,6 +17,45 @@ export class GeminiProvider extends AIProvider {
     this.model = config.ai.gemini.model;
   }
 
+  private async getAvailableModel(): Promise<string> {
+    if (this.resolvedModel) {
+      return this.resolvedModel;
+    }
+
+    try {
+      logger.info('Fetching available Gemini models');
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models?key=${this.apiKey}`
+      );
+
+      if (!response.ok) {
+        logger.error('Failed to fetch models list', { status: response.status });
+        throw new Error(`Failed to fetch models: ${response.status}`);
+      }
+
+      const data: any = await response.json();
+      
+      // Find first model that supports generateContent
+      const availableModel = data.models?.find((m: any) => 
+        m.supportedGenerationMethods?.includes('generateContent')
+      );
+
+      if (!availableModel) {
+        throw new Error('No suitable Gemini model found that supports generateContent');
+      }
+
+      // Extract model name from full path (e.g., "models/gemini-pro" -> "gemini-pro")
+      const modelName = availableModel.name.replace('models/', '');
+      this.resolvedModel = modelName;
+      logger.info('Using Gemini model', { model: modelName, displayName: availableModel.displayName });
+      
+      return modelName;
+    } catch (error) {
+      logger.error('Failed to get available model', { error });
+      throw error;
+    }
+  }
+
   async reviewPR(context: PRContext): Promise<AIReviewResult> {
     logger.info('Starting Gemini PR review', {
       pr: context.pullNumber,
@@ -24,10 +64,13 @@ export class GeminiProvider extends AIProvider {
     });
 
     try {
+      // Get the actual available model
+      const modelToUse = await this.getAvailableModel();
+      
       const prompt = this.buildReviewPrompt(context);
 
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${this.model}:generateContent?key=${this.apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/${modelToUse}:generateContent?key=${this.apiKey}`,
         {
           method: 'POST',
           headers: {
