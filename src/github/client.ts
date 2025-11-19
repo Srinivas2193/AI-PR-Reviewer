@@ -93,6 +93,9 @@ export class GitHubClient {
         pull_number: pullNumber,
         commit_id: commitId,
         event: 'COMMENT',
+        body: '## 🤖 AI Code Reviewer\n\n' +
+              `Found ${comments.length} issue${comments.length > 1 ? 's' : ''} that need attention. ` +
+              'See inline comments below for details.',
         comments: comments.map((c) => ({
           path: c.path,
           line: c.line,

@@ -121,7 +121,8 @@ Analyze this PR thoroughly and provide:
     const { summary } = result;
     const ratingEmoji = summary.overallRating >= 8 ? '🟢' : summary.overallRating >= 6 ? '🟡' : '🔴';
 
-    let markdown = `## 🤖 AI Code Review\n\n`;
+    let markdown = `# 🤖 AI Code Reviewer\n\n`;
+    markdown += `> Automated code review powered by AI\n\n`;
     markdown += `### ${ratingEmoji} Overall Rating: ${summary.overallRating}/10\n\n`;
     markdown += `${summary.summary}\n\n`;
 
