@@ -278,4 +278,5 @@ MIT License - feel free to use this in your projects!
 **Made with ❤️ for better code reviews**
 
 #   T e s t i n g   A I   r e v i e w e r  
+ #   T r i g g e r   a f t e r   b i l l i n g   s e t u p  
  
