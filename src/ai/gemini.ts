@@ -54,11 +54,22 @@ export class GeminiProvider extends AIProvider {
       );
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(`Gemini API error: ${JSON.stringify(errorData)}`);
+        const errorText = await response.text();
+        logger.error('Gemini API error', { 
+          status: response.status, 
+          statusText: response.statusText,
+          error: errorText 
+        });
+        throw new Error(`Gemini API error (${response.status}): ${errorText}`);
       }
 
       const data: any = await response.json();
+      
+      if (!data.candidates || data.candidates.length === 0) {
+        logger.error('No response from Gemini', { data });
+        throw new Error('Gemini returned no candidates in response');
+      }
+      
       const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
 
       logger.info('Received Gemini response', {
