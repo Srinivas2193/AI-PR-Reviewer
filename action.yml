@@ -1,0 +1,88 @@
+name: 'AI Code Reviewer'
+description: 'Automated PR code reviews using AI (GPT-4 or Claude) with inline comments and comprehensive feedback'
+author: 'AI Code Reviewer Team'
+branding:
+  icon: 'check-circle'
+  color: 'purple'
+
+inputs:
+  github-token:
+    description: 'GitHub token for API access'
+    required: true
+    default: ${{ github.token }}
+  
+  ai-provider:
+    description: 'AI provider to use (openai or anthropic)'
+    required: true
+    default: 'openai'
+  
+  openai-api-key:
+    description: 'OpenAI API key (required if ai-provider is openai)'
+    required: false
+  
+  openai-model:
+    description: 'OpenAI model to use'
+    required: false
+    default: 'gpt-4-turbo-preview'
+  
+  anthropic-api-key:
+    description: 'Anthropic API key (required if ai-provider is anthropic)'
+    required: false
+  
+  anthropic-model:
+    description: 'Anthropic model to use'
+    required: false
+    default: 'claude-3-5-sonnet-20241022'
+  
+  max-files:
+    description: 'Maximum number of files to review'
+    required: false
+    default: '20'
+  
+  max-file-size-kb:
+    description: 'Maximum file size in KB to review'
+    required: false
+    default: '500'
+  
+  review-severity:
+    description: 'Review severity level (low, medium, high)'
+    required: false
+    default: 'medium'
+
+outputs:
+  review-completed:
+    description: 'Whether the review was completed successfully'
+  
+  rating:
+    description: 'Overall rating given by the AI (1-10)'
+  
+  comments-count:
+    description: 'Number of inline comments posted'
+
+runs:
+  using: 'node20'
+  main: 'dist/action.js'
+  
+  pre:
+    - run: |
+        echo "🤖 Starting AI Code Review..."
+        echo "Provider: ${{ inputs.ai-provider }}"
+        echo "PR Number: ${{ github.event.pull_request.number }}"
+  
+  post:
+    - run: |
+        echo "✅ AI Code Review completed!"
+
+env:
+  GITHUB_TOKEN: ${{ inputs.github-token }}
+  AI_PROVIDER: ${{ inputs.ai-provider }}
+  OPENAI_API_KEY: ${{ inputs.openai-api-key }}
+  OPENAI_MODEL: ${{ inputs.openai-model }}
+  ANTHROPIC_API_KEY: ${{ inputs.anthropic-api-key }}
+  ANTHROPIC_MODEL: ${{ inputs.anthropic-model }}
+  MAX_FILES_TO_REVIEW: ${{ inputs.max-files }}
+  MAX_FILE_SIZE_KB: ${{ inputs.max-file-size-kb }}
+  REVIEW_SEVERITY: ${{ inputs.review-severity }}
+  PR_NUMBER: ${{ github.event.pull_request.number }}
+  GITHUB_REPOSITORY: ${{ github.repository }}
+
